@@ -9,8 +9,37 @@
   <div class="container">
     <h1>Welcome to My AWS Demo App</h1>
     <p>This application lists your S3 buckets behind the scenes.</p>
-    <p>Currently, the AWS credentials are <strong>hard-coded</strong> in <code>config.py</code>. In the next step, we'll replace them with <strong>AWS Secrets Manager</strong>.</p>
-    <a href="/buckets" class="btn">View My S3 Buckets</a>
+    <button id="view-buckets" class="btn">View My S3 Buckets</button>
+
+    <ul id="bucket-list"></ul>
   </div>
+
+  <script>
+    const btn = document.getElementById("view-buckets");
+    const ul = document.getElementById("bucket-list");
+
+    btn.addEventListener("click", () => {
+      // Temizle
+      ul.innerHTML = "";
+      
+      fetch("/buckets")
+        .then(res => res.json())
+        .then(data => {
+          if(data.buckets && data.buckets.length > 0){
+            data.buckets.forEach(name => {
+              const li = document.createElement("li");
+              li.textContent = name;
+              ul.appendChild(li);
+            });
+          } else {
+            ul.innerHTML = "<li>No buckets found</li>";
+          }
+        })
+        .catch(err => {
+          ul.innerHTML = "<li>Error fetching buckets</li>";
+          console.error(err);
+        });
+    });
+  </script>
 </body>
 </html>
